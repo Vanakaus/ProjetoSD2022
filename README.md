@@ -2,7 +2,8 @@
 Repositório para o projeto de desenvolvimento de aplicação distribuída, para a matéria de sistemas distribuídos, 2022/2.
 
 ## Tema:
-Monitoramento e processamento de notícias no facebook/twitter ou outras fontes, sistema de notificações e tags dessas noticias.
+Jogo da memória.
+Jogadores: 2 a 4 jogadores.
 
 ## Tecnologias: 
 Usaremos para desenvolver essa aplicação a linguagem python, e o sistema de fila de mensagens RabbitMQ.
