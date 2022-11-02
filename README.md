@@ -8,8 +8,8 @@ Monitoramento e processamento de notícias no facebook/twitter ou outras fontes,
 Usaremos para desenvolver essa aplicação a linguagem python, e o sistema de fila de mensagens RabbitMQ.
 
 ## Alunos: 
-João Vitor Zavatin - Ra: 1923242
-Vinicius Vieira
+João Vitor Zavatin - Ra: 1923242,
+Vinicius Vieira - Ra: 2046474
 
 ## Professor:
 Prof. Rodrigo Campiolo
