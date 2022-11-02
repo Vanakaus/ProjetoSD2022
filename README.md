@@ -2,7 +2,7 @@
 Repositório para o projeto de desenvolvimento de aplicação distribuída, para a matéria de sistemas distribuídos, 2022/2.
 
 ## Tema:
-Jogo da memória.
+Jogo da memória.  
 Jogadores: 2 a 4 jogadores.
 
 ## Tecnologias: 
