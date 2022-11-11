@@ -4,7 +4,7 @@ Repositório para o projeto de desenvolvimento de aplicação distribuída, para
 ## Tema:
 Um jogo da memória multijogador.
 Arquitetura:
-![alt text](https://github.com/JVZavatin/ProjetoSD2022/images/Arquitecture.png?raw=true "Arquitetura")
+![alt text](https://github.com/JVZavatin/ProjetoSD2022/blob/main/images/Arquitecture.png?raw=true "Arquitetura")
 
 ## Tecnologias: 
 Usaremos para desenvolver essa aplicação a linguagem python, com o Tkinter.
