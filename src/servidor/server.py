@@ -5,9 +5,10 @@ window = tk.Tk()
 bg_janela = "#00c8ff"
 bg_quadro = "#fefefe"
 bg_carta = "#e8c999"
-pontos = 0
-lbl_pontuacao2 = tk.Label()
+listPlayers = []
+listPontos = []
 lbl_listPlayers = tk.Label()
+
 cartas = [[0 for x in range(6)] for x in range(6)]
 carta1 = [-1, -1]
 carta2 = [-1, -1]
@@ -38,35 +39,25 @@ cores[17] = "#000000"
 
 
 def janela():
-    window.title("Jogo da Memória")
+    window.title("Servidor")
     window.geometry("800x500")
     window.configure(bg=bg_janela)
     window.resizable(False, False)
-    window.iconbitmap("src/icons/play.ico")
+    window.iconbitmap("src/icons/cartas.ico")
 
-    lbl_titulo = tk.Label(window, text="Jogo da Memoria", bg=bg_janela, font=("Arial", 32))
-    lbl_titulo.place(x=220, y = 30)
-
-def pontuacao():
-    quadro = tk.Frame(window, width=200, height=80, bg=bg_quadro)
-    quadro.place(x=20, y=100)
-
-    lbl_pontuacao = tk.Label(text="Sua Pontuação:", bg=bg_quadro, font=("arial", 20))
-    lbl_pontuacao.place(x=20, y=100)
-    global lbl_pontuacao2
-    lbl_pontuacao2 = tk.Label(text=pontos, bg=bg_quadro, font=("arial", 20))
-    lbl_pontuacao2.place(x=25, y=130)
+    lbl_titulo = tk.Label(window, text="Servidor\nJogo da Memoria", bg=bg_janela, font=("Arial", 30))
+    lbl_titulo.place(x=250, y = 5)
 
 def players():
-    quadro2 = tk.Frame(window, width=200, height=280, bg=bg_quadro)
-    quadro2.place(x=20, y=200)
+    quadro = tk.Frame(window, width=200, height=380, bg=bg_quadro)
+    quadro.place(x=20, y=100)
 
     lbl_players = tk.Label(text="Jogadores", bg=bg_quadro, font=("arial", 22))
-    lbl_players.place(x=40, y=200)
+    lbl_players.place(x=40, y=120)
+    global lbl_listPlayers
+    lbl_listPlayers = tk.Label(text="João Vitor: 8 \nVinicius: 5", bg=bg_quadro, font=("arial", 20), justify="left")
+    lbl_listPlayers.place(x=25, y=180)
 
-    global lbl_listplayers
-    lbl_listPlayers = tk.Label(text="João Vitor: 8 \nVinicius: 5", bg=bg_quadro, font=("arial", 18), justify="left")
-    lbl_listPlayers.place(x=25, y=250)
 
 def mesa():
     mesa = tk.Frame(window, width=500, height=380, bg=bg_quadro)
@@ -120,9 +111,6 @@ def Escolher(y, x):
             carta2[0] = -1
             carta2[1] = -1
 
-            global pontos
-            pontos = pontos + 1
-            lbl_pontuacao2.config(text=pontos)
         else:
             print("Errou")
             cartas[carta1[1]][carta1[0]].config(bg=bg_carta, state="normal")
@@ -133,21 +121,12 @@ def Escolher(y, x):
             carta2[1] = -1
 
 
-def retirar(x, y):
-    # cartas[x][y].destroy()
-    # print("Carta [{}][{}] retirada".format(x, y))
-    # print("x", x)
-    # print("y", y)
-    bg_carta = "white"
-    cartas[x][y].config(bg=bg_carta)
-    cartas[x][y].config(state="disabled")
 
 
 if __name__ == "__main__":
     print("Iniciando cliente")
 
     janela()
-    pontuacao()
     players()
     mesa()
     sortear()
