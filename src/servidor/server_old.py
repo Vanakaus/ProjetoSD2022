@@ -1,5 +1,13 @@
 import tkinter as tk
+import pika
 from random import shuffle
+
+
+conexao = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+canal = conexao.channel()
+
+# Conectando ao canal de tweets
+canal.queue_declare(queue='teste')
 
 window = tk.Tk()
 bg_janela = "#00c8ff"
@@ -86,39 +94,46 @@ def atrribuir_cores():
 
 def Escolher(y, x):
     print("Carta [{}][{}] escolhida".format(x, y))
-    print("x", x)
-    print("y", y)
-    print("Cor: ", y*6 + x)
+    
+    canal.basic_publish(exchange='', routing_key='teste', body="Carta [{}][{}] escolhida".format(x, y))
 
-    cartas[y][x].config(bg=seq_cores[y*6 + x])
-    cartas[y][x].config(state="disabled")
-    if carta1[0] == -1 and carta1[1] == -1:
-        carta1[0] = x
-        carta1[1] = y
-    elif carta2[0] == -1 and carta2[1] == -1:
-        carta2[0] = x
-        carta2[1] = y
 
-        window.update()
-        window.after(1000)
 
-        if seq_cores[carta1[0] + carta1[1]*6] == seq_cores[carta2[0] + carta2[1]*6]:
-            print("Acertou")
-            cartas[carta1[1]][carta1[0]].destroy()
-            cartas[carta2[1]][carta2[0]].destroy()
-            carta1[0] = -1
-            carta1[1] = -1
-            carta2[0] = -1
-            carta2[1] = -1
+# def Escolher(y, x):
+#     print("Carta [{}][{}] escolhida".format(x, y))
+#     print("x", x)
+#     print("y", y)
+#     print("Cor: ", y*6 + x)
 
-        else:
-            print("Errou")
-            cartas[carta1[1]][carta1[0]].config(bg=bg_carta, state="normal")
-            cartas[carta2[1]][carta2[0]].config(bg=bg_carta, state="normal")
-            carta1[0] = -1
-            carta1[1] = -1
-            carta2[0] = -1
-            carta2[1] = -1
+#     cartas[y][x].config(bg=seq_cores[y*6 + x])
+#     cartas[y][x].config(state="disabled")
+#     if carta1[0] == -1 and carta1[1] == -1:
+#         carta1[0] = x
+#         carta1[1] = y
+#     elif carta2[0] == -1 and carta2[1] == -1:
+#         carta2[0] = x
+#         carta2[1] = y
+
+#         window.update()
+#         window.after(1000)
+
+#         if seq_cores[carta1[0] + carta1[1]*6] == seq_cores[carta2[0] + carta2[1]*6]:
+#             print("Acertou")
+#             cartas[carta1[1]][carta1[0]].destroy()
+#             cartas[carta2[1]][carta2[0]].destroy()
+#             carta1[0] = -1
+#             carta1[1] = -1
+#             carta2[0] = -1
+#             carta2[1] = -1
+
+#         else:
+#             print("Errou")
+#             cartas[carta1[1]][carta1[0]].config(bg=bg_carta, state="normal")
+#             cartas[carta2[1]][carta2[0]].config(bg=bg_carta, state="normal")
+#             carta1[0] = -1
+#             carta1[1] = -1
+#             carta2[0] = -1
+#             carta2[1] = -1
 
 
 

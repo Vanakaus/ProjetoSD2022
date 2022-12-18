@@ -1,6 +1,13 @@
+import threading
 import tkinter as tk
+import pika
 from random import shuffle
+import com
+import tela
 
+
+conexao = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+canal = conexao.channel()
 window = tk.Tk()
 bg_janela = "#00c8ff"
 bg_quadro = "#fefefe"
@@ -51,22 +58,13 @@ def pontuacao():
     quadro = tk.Frame(window, width=200, height=80, bg=bg_quadro)
     quadro.place(x=20, y=100)
 
-    lbl_pontuacao = tk.Label(text="Sua Pontuação:", bg=bg_quadro, font=("arial", 20))
-    lbl_pontuacao.place(x=20, y=100)
+    lbl_pontuacao = tk.Label(quadro, text="Sua Pontuação:", bg=bg_quadro, font=("arial", 20))
+    lbl_pontuacao.place(x=0, y=0)
     global lbl_pontuacao2
-    lbl_pontuacao2 = tk.Label(text=pontos, bg=bg_quadro, font=("arial", 20))
-    lbl_pontuacao2.place(x=25, y=130)
+    lbl_pontuacao2 = tk.Label(quadro, text=pontos, bg=bg_quadro, font=("arial", 20))
+    lbl_pontuacao2.place(x=5, y=30)
 
-def players():
-    quadro2 = tk.Frame(window, width=200, height=280, bg=bg_quadro)
-    quadro2.place(x=20, y=200)
 
-    lbl_players = tk.Label(text="Jogadores", bg=bg_quadro, font=("arial", 22))
-    lbl_players.place(x=40, y=200)
-
-    global lbl_listplayers
-    lbl_listPlayers = tk.Label(text="João Vitor: 8 \nVinicius: 5", bg=bg_quadro, font=("arial", 18), justify="left")
-    lbl_listPlayers.place(x=25, y=250)
 
 def mesa():
     mesa = tk.Frame(window, width=500, height=380, bg=bg_quadro)
@@ -97,40 +95,50 @@ def Escolher(y, x):
     print("Carta [{}][{}] escolhida".format(x, y))
     print("x", x)
     print("y", y)
-    print("Cor: ", y*6 + x)
 
-    cartas[y][x].config(bg=seq_cores[y*6 + x])
-    cartas[y][x].config(state="disabled")
-    if carta1[0] == -1 and carta1[1] == -1:
-        carta1[0] = x
-        carta1[1] = y
-    elif carta2[0] == -1 and carta2[1] == -1:
-        carta2[0] = x
-        carta2[1] = y
+    cartas[y][x]["state"] = "disabled"
 
-        window.update()
-        window.after(1000)
 
-        if seq_cores[carta1[0] + carta1[1]*6] == seq_cores[carta2[0] + carta2[1]*6]:
-            print("Acertou")
-            cartas[carta1[1]][carta1[0]].destroy()
-            cartas[carta2[1]][carta2[0]].destroy()
-            carta1[0] = -1
-            carta1[1] = -1
-            carta2[0] = -1
-            carta2[1] = -1
 
-            global pontos
-            pontos = pontos + 1
-            lbl_pontuacao2.config(text=pontos)
-        else:
-            print("Errou")
-            cartas[carta1[1]][carta1[0]].config(bg=bg_carta, state="normal")
-            cartas[carta2[1]][carta2[0]].config(bg=bg_carta, state="normal")
-            carta1[0] = -1
-            carta1[1] = -1
-            carta2[0] = -1
-            carta2[1] = -1
+
+# def Escolher(y, x):
+#     print("Carta [{}][{}] escolhida".format(x, y))
+#     print("x", x)
+#     print("y", y)
+#     print("Cor: ", y*6 + x)
+
+#     cartas[y][x].config(bg=seq_cores[y*6 + x])
+#     cartas[y][x].config(state="disabled")
+#     if carta1[0] == -1 and carta1[1] == -1:
+#         carta1[0] = x
+#         carta1[1] = y
+#     elif carta2[0] == -1 and carta2[1] == -1:
+#         carta2[0] = x
+#         carta2[1] = y
+
+#         window.update()
+#         window.after(1000)
+
+#         if seq_cores[carta1[0] + carta1[1]*6] == seq_cores[carta2[0] + carta2[1]*6]:
+#             print("Acertou")
+#             cartas[carta1[1]][carta1[0]].destroy()
+#             cartas[carta2[1]][carta2[0]].destroy()
+#             carta1[0] = -1
+#             carta1[1] = -1
+#             carta2[0] = -1
+#             carta2[1] = -1
+
+#             global pontos
+#             pontos = pontos + 1
+#             lbl_pontuacao2.config(text=pontos)
+#         else:
+#             print("Errou")
+#             cartas[carta1[1]][carta1[0]].config(bg=bg_carta, state="normal")
+#             cartas[carta2[1]][carta2[0]].config(bg=bg_carta, state="normal")
+#             carta1[0] = -1
+#             carta1[1] = -1
+#             carta2[0] = -1
+#             carta2[1] = -1
 
 
 def retirar(x, y):
@@ -143,14 +151,31 @@ def retirar(x, y):
     cartas[x][y].config(state="disabled")
 
 
+
+
 if __name__ == "__main__":
     print("Iniciando cliente")
 
+    vetorThreads = []
+
+    thread = threading.Thread(target=com.comunicacao, args=[canal])
+    thread.start()
+    vetorThreads.append(thread)
+
+
     janela()
     pontuacao()
-    players()
+    tela.players(window, bg_quadro)
     mesa()
     sortear()
     atrribuir_cores()
 
     window.mainloop()
+
+    print("Fechando cliente")
+
+    canal.basic_publish(exchange='', routing_key='teste', body='sair')
+
+    for thread in vetorThreads:
+        thread.join()
+    print("Cliente fechado")
