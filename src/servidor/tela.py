@@ -14,7 +14,7 @@ from random import shuffle
 
 # Variáveis globais
 window = tk.Tk()
-bg_janela = "#00c8ff"
+bg_janela = "#00aa00"
 bg_quadro = "#fefefe"
 bg_carta = "#e8c999"
 
