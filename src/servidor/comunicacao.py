@@ -1,16 +1,33 @@
 
 
 import pika
+import json
+import tela
 
 conexao = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
 canal = conexao.channel()
 
 
 def msgJogador(ch, method, properties, body):
-    print(body.decode('utf-8'))
+    print("\nMensagem do jogador: ")
 
-    if body.decode('utf-8') == "sair":
-        canal.stop_consuming()
+    mensagem = body.decode('utf-8').replace('\'', '"')
+    msg = json.loads(mensagem)
+    
+    print(msg["acao"])
+
+    match msg["acao"]:
+        case "escolher":
+            tela.escolherCarta(msg["x"], msg["y"])
+
+        case "entrar":
+            tela.entrar(msg["nome"])
+
+        case "sair":
+            canal.stop_consuming()
+        
+        case _:
+            print("Ação não reconhecida")
 
 
 

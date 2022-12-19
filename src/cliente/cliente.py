@@ -6,7 +6,7 @@ import threading
 
 
 if __name__ == '__main__':
-    print("Iniciando Cliente")
+    print("Iniciando Cliente...\n")
     
     vetorThreads = []
 
@@ -15,7 +15,7 @@ if __name__ == '__main__':
     thread.start()
     vetorThreads.append(thread)
 
-    print("Iniciando Tela")
+    print("Iniciando Janela\n")
     target=tela.main()
 
     for t in vetorThreads:

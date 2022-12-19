@@ -7,17 +7,21 @@ window = tk.Tk()
 bg_janela = "#00c8ff"
 bg_quadro = "#fefefe"
 bg_carta = "#e8c999"
-pontos = 0
-listPlayers = ''
+
 lbl_pontuacao2 = tk.Label()
 lbl_listPlayers = tk.Label()
+lbl_jogadorAtual = tk.Label()
+lbl_resposta = tk.Label()
+btn_entrar = tk.Label()
+
 cartas = [[0 for x in range(6)] for x in range(6)]
-controleCartas = [0 for x in range(36)]
+controleCartas = [x for x in range(36)]
+carta = [-1, -1]
 
 
 def janela():
     window.title("Jogo da Memória")
-    window.geometry("800x500")
+    window.geometry("800x500+1000+200")
     window.configure(bg=bg_janela)
     window.resizable(False, False)
     window.iconbitmap("src/icons/play.ico")
@@ -32,7 +36,7 @@ def pontuacao():
     lbl_pontuacao = tk.Label(quadro, text="Sua Pontuação:", bg=bg_quadro, font=("arial", 20))
     lbl_pontuacao.place(x=0, y=0)
     global lbl_pontuacao2
-    lbl_pontuacao2 = tk.Label(quadro, text=pontos, bg=bg_quadro, font=("arial", 20))
+    lbl_pontuacao2 = tk.Label(quadro, text="0", bg=bg_quadro, font=("arial", 20))
     lbl_pontuacao2.place(x=5, y=30)
 
 def players():
@@ -42,9 +46,14 @@ def players():
     lbl_players = tk.Label(quadro2, text="Jogadores", bg=bg_quadro, font=("arial", 22))
     lbl_players.place(x=20, y=0)
 
-    global lbl_listplayers
-    lbl_listPlayers = tk.Label(quadro2, text="João Vitor: 8 \nVinicius: 5", bg=bg_quadro, font=("arial", 18), justify="left")
+    global lbl_listPlayers
+    lbl_listPlayers = tk.Label(quadro2, text=" ", bg=bg_quadro, font=("arial", 18), justify="left")
     lbl_listPlayers.place(x=5, y=50)
+
+    global lbl_jogadorAtual
+    lbl_jogadorAtual = tk.Label(quadro2, text=" ", bg=bg_quadro, font=("arial", 14), justify="left")
+    lbl_jogadorAtual.place(x=5, y=250)
+
 
 def mesa():
     mesa = tk.Frame(window, width=500, height=380, bg=bg_quadro)
@@ -53,19 +62,177 @@ def mesa():
     mesa2.place(x=75, y=7)
     for i in range(6):
         for j in range(6):
-            cartas[i][j] = tk.Button(mesa2, width=4, height=2, cursor="hand2", bg=bg_carta, activebackground=bg_carta, command=lambda x1=i, y1=j: Escolher(x1,y1))
+            cartas[i][j] = tk.Button(mesa2, width=4, height=2, bg=bg_carta, activebackground=bg_carta, command=lambda x1=i, y1=j: Escolher(x1,y1))
             cartas[i][j].grid(column=j, row=i, padx=12, pady=10)
 
-def Escolher(y, x):
-    print("Carta [{}][{}] escolhida".format(x, y))
 
-    com.canal.basic_publish(exchange='', routing_key='com_jogador', body="carta {} {}".format(x, y))
+def lobby():
+
+    global lbl_jogador
+    lbl_jogador = tk.Label(window, text="Jogador: ", bg=bg_janela, font=("arial", 22, "bold"))
+    lbl_jogador.place(x=400, y=140)
+
+    global ipt_jogador
+    ipt_jogador = tk.Entry(window, width=20, font=("arial", 18))
+    ipt_jogador.place(x=340, y=220)
+
+    global lbl_resposta
+    lbl_resposta = tk.Label(window, text=" ", bg=bg_janela, font=("arial", 14))
+    lbl_resposta.place(x=400, y=255)
+
+    global btn_entrar
+    btn_entrar = tk.Button(window, text="Entrar", width=15, bg="green", activebackground="darkgreen", font=("arial", 16, "bold"), command=lambda: entrar(ipt_jogador.get()))
+    btn_entrar.place(x=360, y=320)
 
 
 def main():
     janela()
     pontuacao()
     players()
-    mesa()
+    lobby()
 
     window.mainloop()
+
+    com.canal.basic_publish(exchange='com_geral', routing_key='', body="{'acao': 'sair'}")
+
+
+
+
+def entrar(nome):
+    print("\nEntrando...")
+    print("Nome: {}".format(nome))
+    com.setNomeJogador(nome)
+    if nome == "":
+        global lbl_resposta
+        lbl_resposta.config(text="Digite um nome!", fg="red")
+    else:
+        global btn_entrar
+        btn_entrar.config(state="disable")
+        com.canal.basic_publish(exchange='', routing_key='com_jogador', body="{'acao': 'entrar', 'nome': '" + nome + "'}")
+
+
+def entrarResposta(mensagem, cor):
+    global lbl_resposta
+    global btn_entrar
+
+    lbl_resposta.config(text=mensagem, fg=cor)
+    
+    if cor == 'red':
+        btn_entrar.config(state="normal")
+    else:
+        com.setEmJogo(True)
+
+
+def virarCarta(x, y, cor):
+    print("\nvirando carta: [{}][{}]".format(x, y))
+    cartas[x][y].config(bg=cor, cursor="arrow")
+    cartas[x][y]["state"] = "disabled"
+
+
+def desvirarCarta(x, y):
+    print("\ndesvirando carta: [{}][{}]".format(x, y))
+    cartas[x][y].config(bg=bg_carta, cursor="arrow")
+    cartas[x][y]["state"] = "disabled"
+
+    carta[0] = -1
+    carta[1] = -1
+
+def retirarCartas(x1, y1, x2, y2):
+    print("\nretirando carta: ")
+    print("carta1: [{}][{}]".format(x1, y1))
+    print("carta2: [{}][{}]".format(x2, y2))
+
+    cartas[x1][y1].config(bg=bg_quadro, activebackground=bg_quadro, cursor="arrow", borderwidth=0)
+    cartas[x1][y1]["state"] = "disabled"
+
+    cartas[x2][y2].config(bg=bg_quadro, activebackground=bg_quadro, cursor="arrow", borderwidth=0) 
+    cartas[x2][y2]["state"] = "disabled"
+
+    controleCartas.pop(controleCartas.index(x1*6+y1))
+    controleCartas.pop(controleCartas.index(x2*6+y2))
+
+    carta[0] = -1
+    carta[1] = -1
+
+def atualizar(listPlayersTxt, pontos):
+    print("\natualizando...")
+
+    print(listPlayersTxt)
+
+    global lbl_listPlayers
+    global lbl_pontuacao2
+
+    lbl_listPlayers.config(text=listPlayersTxt)
+    lbl_pontuacao2.config(text=pontos)
+    
+    print("atualizado")
+
+
+def vezJogador(mensagem, suaVez):
+    print("\n", mensagem)
+
+    global lbl_jogadorAtual
+    lbl_jogadorAtual.config(text=mensagem)
+
+    if suaVez:
+        jogar()
+
+
+def habilitaCartas():
+    for i in range(6):
+        for j in range(6):
+            if i*6+j in controleCartas:
+                cartas[i][j]["state"] = "normal"
+                cartas[i][j].config(cursor="hand2")
+    
+    if carta[0] != -1 and carta[1] != -1:
+        cartas[carta[0]][carta[1]]["state"] = "disabled"
+
+
+def desabilitaCartas():
+    for i in range(6):
+        for j in range(6):
+            if i*6+j in controleCartas:
+                cartas[i][j]["state"] = "disable"
+                cartas[i][j].config(cursor="arrow")
+
+
+def iniciarJogo():
+    print("\nIniciando Jogo!")
+
+    global lbl_jogador
+    lbl_jogador.destroy()
+
+    global ipt_jogador
+    ipt_jogador.destroy()
+
+    global btn_entrar
+    btn_entrar.destroy()
+
+    global lbl_resposta
+    lbl_resposta.destroy()
+
+    mesa()
+    desabilitaCartas()
+
+
+def jogar():
+    print("\nJogando:")
+
+    habilitaCartas()
+
+
+
+def Escolher(x, y):
+    print("Carta [{}][{}] escolhida".format(x, y))
+
+    desabilitaCartas()
+
+    global carta
+    carta[0] = x
+    carta[1] = y
+
+    mensagem = {"acao": "escolher", "x": x, "y": y}
+
+    com.canal.basic_publish(exchange='', routing_key='com_jogador', body=str(mensagem))
+
