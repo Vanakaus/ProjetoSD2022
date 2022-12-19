@@ -1,24 +1,38 @@
+""" 
+    Projeto SD - Jogo da Memória
+    # Autor: Vinicius
+    # Data de criação:      01/11/2022
+    # Data de modificação:  19/12/2022
+    # Este programa é o cliente do jogo da memória.
+    # Ele também é responsável por gerenciar a interface gráfica para o usuário.
+ """
 
 import comunicacao as com
 import tkinter as tk
 from random import shuffle
 
+# Variáveis globais
 window = tk.Tk()
 bg_janela = "#00c8ff"
 bg_quadro = "#fefefe"
 bg_carta = "#e8c999"
 
+# Variáveis dos jogadores e pontuação
 lbl_pontuacao2 = tk.Label()
 lbl_listPlayers = tk.Label()
 lbl_jogadorAtual = tk.Label()
 lbl_resposta = tk.Label()
 btn_entrar = tk.Label()
 
+# Variáveis das cartas
 cartas = [[0 for x in range(6)] for x in range(6)]
 controleCartas = [x for x in range(36)]
 carta = [-1, -1]
 
 
+# Funções
+
+# Função que inicia a janela do cliente
 def janela():
     window.title("Jogo da Memória")
     window.geometry("800x500+1000+200")
@@ -29,6 +43,8 @@ def janela():
     lbl_titulo = tk.Label(window, text="Jogo da Memoria", bg=bg_janela, font=("Arial", 32))
     lbl_titulo.place(x=220, y = 30)
 
+
+# Função que inicia o quadro da pontuação
 def pontuacao():
     quadro = tk.Frame(window, width=200, height=80, bg=bg_quadro)
     quadro.place(x=20, y=100)
@@ -39,6 +55,8 @@ def pontuacao():
     lbl_pontuacao2 = tk.Label(quadro, text="0", bg=bg_quadro, font=("arial", 20))
     lbl_pontuacao2.place(x=5, y=30)
 
+
+# Função que inicia o quadro dos jogadores
 def players():
     quadro2 = tk.Frame(window, width=200, height=280, bg=bg_quadro)
     quadro2.place(x=20, y=200)
@@ -55,6 +73,7 @@ def players():
     lbl_jogadorAtual.place(x=5, y=250)
 
 
+# Função que inicia o quadro da mesa com as cartas
 def mesa():
     mesa = tk.Frame(window, width=500, height=380, bg=bg_quadro)
     mesa.place(x=250, y=100)
@@ -66,6 +85,7 @@ def mesa():
             cartas[i][j].grid(column=j, row=i, padx=12, pady=10)
 
 
+# Função que inicia o quadro do lobby
 def lobby():
 
     global lbl_jogador
@@ -85,19 +105,22 @@ def lobby():
     btn_entrar.place(x=360, y=320)
 
 
+# Função que inicia a janela do cliente
 def main():
     janela()
     pontuacao()
     players()
     lobby()
 
+    # Mantém a janela aberta
     window.mainloop()
 
+    # Fecha a conexão com o servidor
     com.canal.basic_publish(exchange='com_geral', routing_key='', body="{'acao': 'sair'}")
 
 
 
-
+# Função de entrada do jogador
 def entrar(nome):
     print("\nEntrando...")
     print("Nome: {}".format(nome))
@@ -111,6 +134,7 @@ def entrar(nome):
         com.canal.basic_publish(exchange='', routing_key='com_jogador', body="{'acao': 'entrar', 'nome': '" + nome + "'}")
 
 
+# Função que recebe a resposta do servidor sobre a entrada do jogador
 def entrarResposta(mensagem, cor):
     global lbl_resposta
     global btn_entrar
@@ -123,12 +147,14 @@ def entrarResposta(mensagem, cor):
         com.setEmJogo(True)
 
 
+# Função para virar uma carta
 def virarCarta(x, y, cor):
     print("\nvirando carta: [{}][{}]".format(x, y))
     cartas[x][y].config(bg=cor, cursor="arrow")
     cartas[x][y]["state"] = "disabled"
 
 
+# Função para desvirar uma carta
 def desvirarCarta(x, y):
     print("\ndesvirando carta: [{}][{}]".format(x, y))
     cartas[x][y].config(bg=bg_carta, cursor="arrow")
@@ -137,6 +163,7 @@ def desvirarCarta(x, y):
     carta[0] = -1
     carta[1] = -1
 
+# Função para retirar um par de cartas
 def retirarCartas(x1, y1, x2, y2):
     print("\nretirando carta: ")
     print("carta1: [{}][{}]".format(x1, y1))
@@ -154,6 +181,7 @@ def retirarCartas(x1, y1, x2, y2):
     carta[0] = -1
     carta[1] = -1
 
+# Função para atualizar a pontuação e a lista de jogadores
 def atualizar(listPlayersTxt, pontos):
     print("\natualizando...")
 
@@ -168,6 +196,7 @@ def atualizar(listPlayersTxt, pontos):
     print("atualizado")
 
 
+# Função para atualizar a vez do jogador
 def vezJogador(mensagem, suaVez):
     print("\n", mensagem)
 
@@ -178,6 +207,7 @@ def vezJogador(mensagem, suaVez):
         jogar()
 
 
+# Função para habilitar as cartas para o jogador jogar
 def habilitaCartas():
     for i in range(6):
         for j in range(6):
@@ -189,6 +219,7 @@ def habilitaCartas():
         cartas[carta[0]][carta[1]]["state"] = "disabled"
 
 
+# Função para desabilitar as cartas para o jogador não jogar
 def desabilitaCartas():
     for i in range(6):
         for j in range(6):
@@ -197,6 +228,7 @@ def desabilitaCartas():
                 cartas[i][j].config(cursor="arrow")
 
 
+# Função para iniciar o jogo
 def iniciarJogo():
     print("\nIniciando Jogo!")
 
@@ -216,6 +248,7 @@ def iniciarJogo():
     desabilitaCartas()
 
 
+# Função para jogar
 def jogar():
     print("\nJogando:")
 
@@ -223,6 +256,7 @@ def jogar():
 
 
 
+# Função para escolher uma carta
 def Escolher(x, y):
     print("Carta [{}][{}] escolhida".format(x, y))
 

@@ -1,14 +1,24 @@
+""" 
+    Projeto SD - Jogo da Memória
+    # Autor: Vinicius
+    # Data de criação:      01/11/2022
+    # Data de modificação:  19/12/2022
+    # Este programa é o servidor do jogo da memória.
+    # Ele é responsável por gerenciar o jogo.
+"""
 
 from time import sleep
 import comunicacao as com
 import tkinter as tk
 from random import shuffle
 
+# Variáveis globais
 window = tk.Tk()
 bg_janela = "#00c8ff"
 bg_quadro = "#fefefe"
 bg_carta = "#e8c999"
 
+# Variáveis dos jogadores
 listPlayers = []
 listPontos = []
 lbl_listPlayers = tk.Label()
@@ -16,12 +26,14 @@ btn_iniciar = tk.Button()
 playerAtual = 0
 jogoIniciado = False
 
+# Variáveis das cartas
 cartas = [[0 for x in range(6)] for x in range(6)]
 carta1 = [-1, -1]
 carta2 = [-1, -1]
 cores = [""] * 18
 seq_cores = [""] * 36
 
+# Variável das cores
 cores[0] = "#DD0000"
 cores[1] = "#FFA500"
 cores[2] = "#FFC0CB"
@@ -42,6 +54,9 @@ cores[16] = "#808080"
 cores[17] = "#000000"
 
 
+# Funções
+
+# Função que inicia a janela do servidor
 def janela():
     window.title("Servidor")
     window.geometry("800x500+200+200")
@@ -52,6 +67,8 @@ def janela():
     lbl_titulo = tk.Label(window, text="Servidor\nJogo da Memoria", bg=bg_janela, font=("Arial", 30))
     lbl_titulo.place(x=250, y = 5)
 
+
+# Função que monta o quadro de jogadores
 def players():
     quadro = tk.Frame(window, width=200, height=380, bg=bg_quadro)
     quadro.place(x=20, y=100)
@@ -63,6 +80,7 @@ def players():
     lbl_listPlayers.place(x=25, y=180)
 
 
+# Função que monta a mesa com as cartas do jogo
 def mesa():
     mesa = tk.Frame(window, width=500, height=380, bg=bg_quadro)
     mesa.place(x=250, y=100)
@@ -75,6 +93,7 @@ def mesa():
             cartas[i][j].grid(column=j, row=i, padx=12, pady=10)
 
 
+# Função que sorteia as cores das cartas
 def sortear():
     for i in range(18):
         seq_cores[i] = cores[i]
@@ -82,6 +101,7 @@ def sortear():
     shuffle(seq_cores)
 
 
+# Função que atribui as cores às cartas
 def atribuir_cores():
     x = 0
     for i in range(6):
@@ -89,6 +109,8 @@ def atribuir_cores():
             cartas[i][j].config(bg=seq_cores[x])
             x = x + 1
 
+
+# Função que atualiza os jogadores e os pontos na tela
 def atribuir_jogadores():
     global lbl_listPlayers
 
@@ -102,12 +124,14 @@ def atribuir_jogadores():
     atualizar()
 
 
+# Função para o botão iniciar jogo
 def lobby():
     global btn_iniciar
     btn_iniciar = tk.Button(window, text="Iniciar Jogo", font=("Arial", 18), bg="lightgreen", activebackground="lightgreen", state="disable", command=iniciarJogo)
     btn_iniciar.place(x=50, y=40)
 
 
+# Função que inicia a janela do servidor e as funções do servidor
 def main():
 
     janela()
@@ -115,11 +139,14 @@ def main():
     mesa()
     lobby()
 
+    # Mantém a janela aberta
     window.mainloop()
 
+    # Fecha a conexão com o RabbitMQ
     com.canal.basic_publish(exchange='', routing_key='com_jogador', body="{'acao': 'sair'}")
 
 
+# Função que inicia o jogo
 def iniciarJogo():
     print("\nIniciando Jogo: ")
 
@@ -141,6 +168,7 @@ def iniciarJogo():
 
 
 
+# Função insere um novo jogador
 def entrar(jogador):
     print("\Jogador entrando: ", jogador)
 
@@ -163,6 +191,7 @@ def entrar(jogador):
     
 
 
+# Função que atualiza os jogadores e os pontos na tela
 def atualizar():
     print("\nAtualizando Jogadores: ")
 
@@ -177,6 +206,7 @@ def atualizar():
     com.canal.basic_publish(exchange='com_geral', routing_key='', body=str(mensagem))
 
 
+# Função que vira a carta
 def virar(x, y):
     print("\nVirando Carta: ", x, y)
     cartas[x][y].config(relief="sunken")
@@ -186,6 +216,7 @@ def virar(x, y):
     com.canal.basic_publish(exchange='com_geral', routing_key='', body=str(mensagem))
 
 
+# Função que desvira a carta
 def desvirar(x, y):
     print("\nDesvirando Carta: ", x, y)
     cartas[x][y].config(relief="groove")
@@ -195,6 +226,7 @@ def desvirar(x, y):
     com.canal.basic_publish(exchange='com_geral', routing_key='', body=str(mensagem))
 
 
+# Função que retira as cartas
 def retirar():
 
     print("\nRetirar: ", carta1, carta2)
@@ -207,6 +239,7 @@ def retirar():
     com.canal.basic_publish(exchange='com_geral', routing_key='', body=str(mensagem))
 
 
+# Função que avisa o jogador atual
 def vezJogador():
     print("\nVez do Jogador: ", listPlayers[playerAtual])
 
@@ -215,6 +248,7 @@ def vezJogador():
     com.canal.basic_publish(exchange='com_geral', routing_key='', body=str(mensagem))
 
 
+# Função quegerencia a carta escolhida
 def escolherCarta(x, y):
 
     global playerAtual
