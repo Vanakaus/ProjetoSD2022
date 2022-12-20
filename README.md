@@ -32,9 +32,9 @@ De acordo com a ação requisitada o servidor as realiza e retorna uma mensagem 
 O cliente está inscrito na fila de comunicacação do servidor. Assim como o sevidor, ele recebe amensagem e executa uma função com o corpo da mensagem, e de acordo com a atualização ele executa sua função correspondente. 
 
 ![alt text](https://github.com/Vanakaus/ProjetoSD2022/blob/main/images/InterfaceDeServicoTelaCliente.jpg?raw=true "Interface de Serviço 2 do Cliente")
-Após o usuario realizar uma ação dentro do jogo, esta informação é encapsulada em uma mensagem e enviada para o servidor, que controla o jogo, poder gerenciar as aç`~oes e atualizar todos os cliente.
+Após o usuario realizar uma ação dentro do jogo, esta informação é encapsulada em uma mensagem e enviada para o servidor, que controla o jogo, poder gerenciar as ações e atualizar todos os cliente.
 
-### Diagrama de Telas:   
+## Diagrama de Telas:   
 ![alt text](https://github.com/Vanakaus/ProjetoSD2022/blob/main/images/Telas.png?raw=true "Telas")
 
 ## Tecnologias: 
