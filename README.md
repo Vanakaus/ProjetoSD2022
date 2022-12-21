@@ -48,7 +48,7 @@ Para desenvolver essa aplicação usamos a linguagem python, com a biblioteca gr
 João Vitor Zavatin - Ra: 1923242  
 Vinicius Vieira - Ra: 2046474  
   
-Inicialmente o projeto foi desenvolvido em dupla, mas, por motivos de desistência, o projeto foi finalizado por apenas um aluno, Vinicius vieira.
+Inicialmente o projeto foi desenvolvido em dupla, mas, por motivos de desistência, o projeto foi finalizado por apenas um aluno, Vinicius Vieira.
 
 ## Executar o projeto:
 ### Pré-requisitos:
